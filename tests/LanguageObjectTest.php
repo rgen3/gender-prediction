@@ -25,7 +25,7 @@ class LanguageObjectTest extends \PHPUnit_Framework_TestCase
 
     public function testIsMethod()
     {
-        $lang = new Russian();
+        $lang = new Language();
         // is male
         $lang->setName($this->male);
         $gender = $lang->is();
