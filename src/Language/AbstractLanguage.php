@@ -3,6 +3,7 @@
 namespace Rgen3\GenderPrediction\Language;
 
 use Rgen3\GenderPrediction\Predictor;
+use \Rgen3\GenderPrediction\models\Predictor as MPredictor;
 
 abstract class AbstractLanguage implements ILanguage
 {
@@ -12,6 +13,19 @@ abstract class AbstractLanguage implements ILanguage
 
     private $name;
     private $predicted = null;
+
+    public function autocomplete(string $name) : array
+    {
+        $model = new MPredictor();
+        $list = $model->getNameList($name, $this->currentLanguage());
+
+        if (!$list)
+        {
+            $list = $this->emptyAutocompleteList();
+        }
+
+        return $list;
+    }
 
     public final function setName(string $string) : ILanguage
     {
@@ -47,6 +61,11 @@ abstract class AbstractLanguage implements ILanguage
     }
 
     public abstract function predict() : int;
+
+    public function emptyAutocompleteList(): array
+    {
+        return [];
+    }
 
     protected function explode(string $string): array
     {

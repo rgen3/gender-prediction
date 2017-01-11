@@ -5,7 +5,7 @@ namespace Rgen3\GenderPrediction\Language\Russian;
 use Rgen3\GenderPrediction\Language\AbstractLanguage;
 use Rgen3\GenderPrediction\Language\ILanguage;
 use Rgen3\GenderPrediction\Predictor;
-use yii\db\Query;
+use \Rgen3\GenderPrediction\models\Predictor as MPredictor;
 
 class Language extends AbstractLanguage
 {
@@ -14,6 +14,11 @@ class Language extends AbstractLanguage
         Predictor::FEMALE => 'Женщина',
         Predictor::NOT_SET => 'Не определено'
     ];
+
+    public function currentLanguage(): string
+    {
+        return 'Russian';
+    }
 
     public function predict() : int
     {
@@ -57,14 +62,10 @@ class Language extends AbstractLanguage
 
     private function getSex(string $string) : ?string
     {
-        $row = (new Query())
-            ->select('sex')
-            ->from('tmp_names')
-            ->where(['~*', 'name', "{$string}"])
-            ->one();
+        $model = new MPredictor();
+        $sex = $model->getSex($string, $this->getCurrentLang());
 
-        return $row['sex'] ?? null;
-
+        return $sex ?? null;
     }
 
     public function getDropdownItems() : array

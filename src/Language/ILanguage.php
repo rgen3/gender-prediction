@@ -11,4 +11,7 @@ interface ILanguage
 
     public function getDropdownItems(): array;
 
+    public function currentLanguage(): string;
+
+    public function emptyAutocompleteList() : array;
 }

@@ -3,7 +3,6 @@
 namespace Rgen3\GenderPrediction;
 
 use Rgen3\GenderPrediction\Language\ILanguage;
-use Rgen3\GenderPrediction\Language\LanguageException;
 use Rgen3\GenderPrediction\Language\LanguageFabric;
 
 class Predictor
@@ -13,31 +12,22 @@ class Predictor
     const NOT_SET = 2;
 
     protected $lang;
+    protected $fabric;
 
-    protected $langNamespace = (__NAMESPACE__ . "\\Language");
-
-    public function checkLanguageClass(string $className)
+    public function __construct()
     {
-        if (!class_exists($this->getLangClassNamespaced($className)))
-        {
-            throw new LanguageException("Language class {$className} doesn't exists");
-        }
-
-        return $this;
+        $this->fabric = new LanguageFabric();
     }
 
     public function setLanguage(string $lang) : Predictor
     {
-
-        $this->checkLanguageClass($lang);
-        $namespaced = $this->getLangClassNamespaced($lang);
-        $this->lang = new $namespaced;
+        $this->lang = $this->fabric->set($lang)->get();
         return $this;
     }
 
-    public function setLangClassNamespace(string $namespace)
+    public function setLangClassNamespace(string $namespace) : Predictor
     {
-        $this->langNamespace = $namespace;
+        $this->fabric->setLangClassNamespace($namespace);
         return $this;
     }
 
@@ -48,18 +38,19 @@ class Predictor
 
     public function getLangClassNamespace() : string
     {
-        return $this->langNamespace;
+        return $this->fabric->getLangClassNamespace();
     }
 
-    public function getLangClassNamespaced(string $className) : string
-    {
-        $namespace = $this->getLangClassNamespace();
-        return "{$namespace}\\{$className}";
-    }
-
-    public function getDropdownItems()
+    public function getDropdownItems() : array
     {
         return $this->lang->getDropdownItems();
+    }
+
+    public function checkLanguageClass(string $className) : Predictor
+    {
+        $this->fabric->checkLanguageClass($className);
+
+        return $this;
     }
 
     public function predict(string $name) : int
