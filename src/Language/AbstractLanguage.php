@@ -13,8 +13,6 @@ abstract class AbstractLanguage implements ILanguage
     private $name;
     private $predicted = null;
 
-    protected $provider;
-
     public final function setName(string $string) : ILanguage
     {
         try

@@ -13,22 +13,31 @@ class Predictor
     const NOT_SET = 2;
 
     protected $lang;
-    protected $fabric;
 
-    public function __construct()
+    protected $langNamespace = (__NAMESPACE__ . "\\Language");
+
+    public function checkLanguageClass(string $className)
     {
-        $this->fabric = new LanguageFabric();
+        if (!class_exists($this->getLangClassNamespaced($className)))
+        {
+            throw new LanguageException("Language class {$className} doesn't exists");
+        }
+
+        return $this;
     }
 
     public function setLanguage(string $lang) : Predictor
     {
-        $this->lang = $this->fabric->set($lang)->get();
+
+        $this->checkLanguageClass($lang);
+        $namespaced = $this->getLangClassNamespaced($lang);
+        $this->lang = new $namespaced;
         return $this;
     }
 
-    public function setLangClassNamespace(string $namespace) : Predictor
+    public function setLangClassNamespace(string $namespace)
     {
-        $this->fabric->setLangClassNamespace($namespace);
+        $this->langNamespace = $namespace;
         return $this;
     }
 
@@ -39,19 +48,18 @@ class Predictor
 
     public function getLangClassNamespace() : string
     {
-        return $this->fabric->getLangClassNamespace();
+        return $this->langNamespace;
     }
 
-    public function getDropdownItems() : array
+    public function getLangClassNamespaced(string $className) : string
+    {
+        $namespace = $this->getLangClassNamespace();
+        return "{$namespace}\\{$className}";
+    }
+
+    public function getDropdownItems()
     {
         return $this->lang->getDropdownItems();
-    }
-
-    public function checkLanguageClass(string $className) : Predictor
-    {
-        $this->fabric->checkLanguageClass($className);
-
-        return $this;
     }
 
     public function predict(string $name) : int
